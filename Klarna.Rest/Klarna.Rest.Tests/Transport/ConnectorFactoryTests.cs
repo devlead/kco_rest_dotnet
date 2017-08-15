@@ -49,10 +49,9 @@ namespace Klarna.Rest.Tests.Transport
         public void Transport_ConnectorFactory_CreateAdvanced()
         {
             RequestFactory requests = new RequestFactory();
-            IConnector connector = ConnectorFactory.Create(requests, "id", "secret", UserAgent.WithDefaultFields(), Client.EuTestBaseUrl);
+            IConnector connector = ConnectorFactory.Create(requests, "id", "secret", Client.EuTestBaseUrl);
 
             Assert.NotNull(connector);
-            Assert.AreEqual(connector.UserAgent.ToString(), UserAgent.WithDefaultFields().ToString());
         }
 
         #endregion

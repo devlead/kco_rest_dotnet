@@ -21,6 +21,7 @@
 namespace Klarna.Rest.Checkout
 {
     using Klarna.Rest.Models;
+    using System.Threading.Tasks;
 
     /// <summary>
     /// Checkout order resource interface.
@@ -31,19 +32,19 @@ namespace Klarna.Rest.Checkout
         /// Creates the resource.
         /// </summary>
         /// <param name="checkoutOrderData">the order data</param>
-        void Create(CheckoutOrderData checkoutOrderData);
+        Task Create(CheckoutOrderData checkoutOrderData);
 
         /// <summary>
         /// Updates the resource.
         /// </summary>
         /// <param name="checkoutOrderData">the order data</param>
         /// <returns>the updated checkout order data</returns>
-        CheckoutOrderData Update(CheckoutOrderData checkoutOrderData);
+        Task<CheckoutOrderData> Update(CheckoutOrderData checkoutOrderData);
 
         /// <summary>
         /// Fetches the resource.
         /// </summary>
         /// <returns>the checkout order data</returns>
-        CheckoutOrderData Fetch();
+        Task<CheckoutOrderData> Fetch();
     }
 }

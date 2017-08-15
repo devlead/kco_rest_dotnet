@@ -22,6 +22,7 @@ namespace Klarna.Rest.Tests.Transport
 {
     using System;
     using System.Net;
+    using System.Threading.Tasks;
     using Klarna.Rest.Transport;
     using NUnit.Framework;
     using Rhino.Mocks;
@@ -55,11 +56,6 @@ namespace Klarna.Rest.Tests.Transport
         private string secret;
 
         /// <summary>
-        /// The user agent.
-        /// </summary>
-        private UserAgent userAgent;
-
-        /// <summary>
         /// The base url.
         /// </summary>
         private Uri baseUrl;
@@ -77,9 +73,8 @@ namespace Klarna.Rest.Tests.Transport
             this.requestMock = MockRepository.GenerateStub<IRequestFactory>();
             this.merchantId = "merchantId";
             this.secret = "secret";
-            this.userAgent = UserAgent.WithDefaultFields();
             this.baseUrl = new Uri("https://dummytesturi.test");
-            this.connector = ConnectorFactory.Create(this.requestMock, this.merchantId, this.secret, this.userAgent, this.baseUrl);
+            this.connector = ConnectorFactory.Create(this.requestMock, this.merchantId, this.secret, this.baseUrl);
         }
 
         #endregion
@@ -93,17 +88,15 @@ namespace Klarna.Rest.Tests.Transport
         public void Transport_Connector_CreateRequest_Basic()
         {
             // Arrange
-            string payload = "payload";
             HttpMethod method = HttpMethod.Post;
             var request = (HttpWebRequest)WebRequest.Create("https://somerandomuri.test");
             this.requestMock.Stub(x => x.CreateRequest(this.baseUrl.ToString())).Return(request);
 
             // Act
-            this.connector.CreateRequest(this.baseUrl.ToString(), HttpMethod.Post, payload);
+            this.connector.CreateRequest(this.baseUrl.ToString(), HttpMethod.Post);
 
             // Assert
             TestsHelper.AssertRequest(this.merchantId, this.secret, request, method);
-            Assert.AreEqual(payload.Length, request.ContentLength);
         }
 
         /// <summary>
@@ -113,18 +106,16 @@ namespace Klarna.Rest.Tests.Transport
         public void Transport_Connector_CreateRequest_NewUrl()
         {
             // Arrange
-            string payload = "payload";
             string newUrl = "newUrl/sdf";
             HttpMethod method = HttpMethod.Get;
             var request = (HttpWebRequest)WebRequest.Create(this.baseUrl);
             this.requestMock.Stub(x => x.CreateRequest(this.baseUrl.ToString() + newUrl)).Return(request);
 
             // Act
-            this.connector.CreateRequest(newUrl, method, payload);
+            this.connector.CreateRequest(newUrl, method);
 
             // Assert
             TestsHelper.AssertRequest(this.merchantId, this.secret, request, method);
-            Assert.AreEqual(payload.Length, request.ContentLength);
         }
 
         /// <summary>
@@ -134,18 +125,16 @@ namespace Klarna.Rest.Tests.Transport
         public void Transport_Connector_CreateRequest_UrlStartsWithBaseUrl()
         {
             // Arrange
-            string payload = "payload";
             string newUrl = this.baseUrl + "newUrl";
             HttpMethod method = HttpMethod.Get;
             var request = (HttpWebRequest)WebRequest.Create("https://somerandomuri.test");
             this.requestMock.Stub(x => x.CreateRequest(newUrl)).Return(request);
 
             // Act
-            this.connector.CreateRequest(newUrl, method, payload);
+            this.connector.CreateRequest(newUrl, method);
 
             // Assert
             TestsHelper.AssertRequest(this.merchantId, this.secret, request, method);
-            Assert.AreEqual(payload.Length, request.ContentLength);
         }
 
         /// <summary>
@@ -157,7 +146,7 @@ namespace Klarna.Rest.Tests.Transport
             // Arrange
             string payload = "payload";
             var request = (HttpWebRequest)WebRequest.Create("https://somerandomuri.test");
-            IResponse responseValidatorMock = MockRepository.GenerateStub<IResponse>();
+            Task<IResponse> responseValidatorMock = Task.FromResult(MockRepository.GenerateStub<IResponse>());
             this.requestMock.Stub(x => x.Send(request, payload)).Return(responseValidatorMock);
 
             // Act
@@ -165,16 +154,6 @@ namespace Klarna.Rest.Tests.Transport
 
             // Assert
             Assert.AreEqual(responseValidatorMock, responseValidator);
-        }
-
-        /// <summary>
-        /// Test get property UserAgent.
-        /// </summary>
-        [Test]
-        public void Transport_Connector_Get_UserAgent()
-        {
-            Assert.NotNull(this.connector.UserAgent);
-            Assert.AreSame(this.connector.UserAgent, this.userAgent);
         }
 
         #endregion

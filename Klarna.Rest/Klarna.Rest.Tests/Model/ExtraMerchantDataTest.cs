@@ -1,6 +1,6 @@
 ﻿#region Copyright Header
 //-----------------------------------------------------------------------
-// <copyright file="CaptureComponentTests.cs" company="Klarna AB">
+// <copyright file="ExtraMerchantDataTest.cs" company="Klarna AB">
 //     Copyright 2014 Klarna AB
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -31,7 +31,7 @@ namespace Klarna.Rest.Tests.Model
     /// Unit tests of the extra merchant data class.
     /// </summary>
     [TestFixture]
-    class ExtraMerchantDataTest
+    public class ExtraMerchantDataTest
     {
         /// <summary>
         /// Expected JSON string.
@@ -89,6 +89,7 @@ namespace Klarna.Rest.Tests.Model
         /// <summary>
         /// Ensure that an exception is thrown when the attachment content type does not match.
         /// </summary>
+        /// <param name="contentType">The content type.</param>
         [TestCase("application/vnd.something.else+json"), TestCase(null), TestCase("")]
         public void TestCastAttachmentToExtraMerchantDataIncorrectContentType(string contentType)
         {
@@ -98,8 +99,10 @@ namespace Klarna.Rest.Tests.Model
                 Body = JSON
             };
 
-            InvalidCastException e = Assert.Throws<InvalidCastException>(
-                delegate { ExtraMerchantData emd = attachment; } );
+            InvalidCastException e = Assert.Throws<InvalidCastException>(() =>
+            {
+                ExtraMerchantData emd = attachment;
+            });
 
             Assert.AreEqual("Incorrect Content-Type", e.Message);
         }

@@ -23,6 +23,7 @@ namespace Klarna.Rest
     using System;
     using Klarna.Rest.Models;
     using Klarna.Rest.Transport;
+    using System.Threading.Tasks;
 
     /// <summary>
     /// Abstract resource class.
@@ -72,7 +73,7 @@ namespace Klarna.Rest
         /// </summary>
         /// <param name="url">the url</param>
         /// <returns>the response</returns>
-        protected ResponseValidator Get(string url)
+        protected Task<ResponseValidator> Get(string url)
         {
             return this.Request(url, null, HttpMethod.Get);
         }
@@ -83,7 +84,7 @@ namespace Klarna.Rest
         /// <param name="url">the url</param>
         /// <param name="data">the checkout order data</param>
         /// <returns>the response</returns>
-        protected ResponseValidator Patch(string url, Model data)
+        protected Task<ResponseValidator> Patch(string url, Model data)
         {
             return this.Request(url, data, HttpMethod.Patch);
         }
@@ -94,7 +95,7 @@ namespace Klarna.Rest
         /// <param name="url">the url</param>
         /// <param name="data">the checkout order data</param>
         /// <returns>the response</returns>
-        protected ResponseValidator Post(string url, Model data)
+        protected Task<ResponseValidator> Post(string url, Model data)
         {
             return this.Request(url, data, HttpMethod.Post);
         }
@@ -106,16 +107,16 @@ namespace Klarna.Rest
         /// <param name="data">the checkout order data</param>
         /// <param name="httpMethod">the http method</param>
         /// <returns>the response</returns>
-        private ResponseValidator Request(string url, Model data, HttpMethod httpMethod)
+        private async Task<ResponseValidator> Request(string url, Model data, HttpMethod httpMethod)
         {
             string json = data != null ? data.ConvertToJson() : string.Empty;
-            var request = this.Connector.CreateRequest(url, httpMethod, json);
+            var request = this.Connector.CreateRequest(url, httpMethod);
             if (data != null)
             {
                 request.ContentType = "application/json";
             }
 
-            return new ResponseValidator(this.Connector.Send(request, json));
+            return new ResponseValidator(await this.Connector.Send(request, json));
         }
 
         #endregion

@@ -21,7 +21,9 @@
 namespace Klarna.Rest.Tests.OrderManagement
 {
     using System;
+    using System.Diagnostics.CodeAnalysis;
     using System.Net;
+    using System.Threading.Tasks;
     using Klarna.Rest.Models;
     using Klarna.Rest.Models.Requests;
     using Klarna.Rest.Transport;
@@ -125,7 +127,8 @@ namespace Klarna.Rest.Tests.OrderManagement
         /// Basic test of Create.
         /// </summary>
         [Test]
-        public void Capture_Create_Basic()
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1615:ElementReturnValueMustBeDocumented", Justification = "Reviewed.")]
+        public async Task Capture_Create_Basic()
         {
             // Arrange
             CaptureData captureData = TestsHelper.GetCapture();
@@ -138,7 +141,7 @@ namespace Klarna.Rest.Tests.OrderManagement
             responseMock.Stub(x => x.Headers).Return(headers);
 
             // Act
-            this.capture.Create(captureData);
+            await this.capture.Create(captureData);
 
             // Assert
             Assert.AreEqual(newTestLocation, this.capture.Location);
@@ -148,7 +151,8 @@ namespace Klarna.Rest.Tests.OrderManagement
         /// Basic test of Fetch.
         /// </summary>
         [Test]
-        public void Capture_Fetch_Basic()
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1615:ElementReturnValueMustBeDocumented", Justification = "Reviewed.")]
+        public async Task Capture_Fetch_Basic()
         {
             // Arrange
             CaptureData captureData = TestsHelper.GetCapture();
@@ -162,7 +166,7 @@ namespace Klarna.Rest.Tests.OrderManagement
             responseMock.Stub(x => x.Headers).Return(headers);
 
             // Act
-            var returnedCheckoutOrder = this.capture.Fetch();
+            var returnedCheckoutOrder = await this.capture.Fetch();
 
             // Assert
             Assert.AreEqual(captureData.CapturedAmount, returnedCheckoutOrder.CapturedAmount);
@@ -174,40 +178,43 @@ namespace Klarna.Rest.Tests.OrderManagement
         /// Basic test of AddShippingInfo.
         /// </summary>
         [Test]
-        public void Capture_AddShippingInfo_Basic()
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1615:ElementReturnValueMustBeDocumented", Justification = "Reviewed.")]
+        public async Task Capture_AddShippingInfo_Basic()
         {
             // Arrange
             var shippingInfo = TestsHelper.GetAddShippingInfo();
 
             IResponse response = TestsHelper.Mock(HttpMethod.Post, this.capture.Location + "/shipping-info", shippingInfo.ConvertToJson(), HttpStatusCode.NoContent, this.connectorMock);
 
-            this.capture.AddShippingInfo(shippingInfo);
+            await this.capture.AddShippingInfo(shippingInfo);
         }
 
         /// <summary>
         /// Basic test of UpdateCustomerDetails.
         /// </summary>
         [Test]
-        public void Capture_UpdateCustomerDetails_Basic()
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1615:ElementReturnValueMustBeDocumented", Justification = "Reviewed.")]
+        public async Task Capture_UpdateCustomerDetails_Basic()
         {
             // Arrange
             UpdateCustomerDetails updateCustomerDetails = TestsHelper.GetUpdateCustomerDetails();
 
             TestsHelper.Mock(HttpMethod.Patch, this.capture.Location + "/customer-details", updateCustomerDetails.ConvertToJson(), HttpStatusCode.NoContent, this.connectorMock);
 
-            this.capture.UpdateCustomerDetails(updateCustomerDetails);
+            await this.capture.UpdateCustomerDetails(updateCustomerDetails);
         }
 
         /// <summary>
         /// Basic test of TriggerSendOut.
         /// </summary>
         [Test]
-        public void Capture_TriggerSendOut_Basic()
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1615:ElementReturnValueMustBeDocumented", Justification = "Reviewed.")]
+        public async Task Capture_TriggerSendOut_Basic()
         {
             // Arrange
             TestsHelper.Mock(HttpMethod.Post, this.capture.Location + "/trigger-send-out", string.Empty, HttpStatusCode.NoContent, this.connectorMock);
 
-            this.capture.TriggerSendOut();
+            await this.capture.TriggerSendOut();
         }
 
         #endregion

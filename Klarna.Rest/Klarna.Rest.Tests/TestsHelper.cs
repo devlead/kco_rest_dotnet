@@ -24,6 +24,7 @@ namespace Klarna.Rest.Tests
     using System.Collections.Generic;
     using System.Net;
     using System.Text;
+    using System.Threading.Tasks;
     using Klarna.Rest.Models;
     using Klarna.Rest.Models.Requests;
     using Klarna.Rest.Transport;
@@ -47,12 +48,12 @@ namespace Klarna.Rest.Tests
         public static IResponse Mock(HttpMethod method, string url, string data, HttpStatusCode statusCode, IConnector connectorMock)
         {
             HttpWebRequest requestMock = (HttpWebRequest)HttpWebRequest.Create("http://testtest.test");
-            connectorMock.Stub(x => x.CreateRequest(url.ToString(), method, data)).Return(requestMock);
+            connectorMock.Stub(x => x.CreateRequest(url.ToString(), method)).Return(requestMock);
 
             IResponse responseMock = MockRepository.GenerateStub<IResponse>();
             responseMock.Stub(x => x.Status).Return(statusCode);
 
-            connectorMock.Stub(x => x.Send(requestMock, data)).Return(responseMock);
+            connectorMock.Stub(x => x.Send(requestMock, data)).Return(Task.FromResult<IResponse>(responseMock));
 
             return responseMock;
         }
@@ -72,11 +73,9 @@ namespace Klarna.Rest.Tests
             string authorization = string.Concat("basic ", base64);
 
             Assert.AreEqual(method.ToString().ToUpper(), httpWebRequest.Method);
-            Assert.AreEqual(UserAgent.WithDefaultFields().ToString(), httpWebRequest.UserAgent);
 
             Assert.AreEqual(secret, ((NetworkCredential)httpWebRequest.Credentials).Password);
             Assert.AreEqual(merchantId, ((NetworkCredential)httpWebRequest.Credentials).UserName);
-            Assert.IsFalse(httpWebRequest.AllowAutoRedirect);
         }
 
         /// <summary>

@@ -56,7 +56,7 @@ namespace Klarna.Rest.Examples
 
                 try
                 {
-                    OrderData orderData = order.Fetch();
+                    OrderData orderData = AsyncHelpers.RunSync(() => order.Fetch());
                 }
                 catch (ApiException ex)
                 {

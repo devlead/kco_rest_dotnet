@@ -21,7 +21,9 @@
 namespace Klarna.Rest.Tests.OrderManagement
 {
     using System;
+    using System.Diagnostics.CodeAnalysis;
     using System.Net;
+    using System.Threading.Tasks;
     using Klarna.Rest.Models;
     using Klarna.Rest.Models.Requests;
     using Klarna.Rest.Transport;
@@ -70,11 +72,6 @@ namespace Klarna.Rest.Tests.OrderManagement
         /// <summary>
         /// The HTTP request.
         /// </summary>
-        private UserAgent userAgent = UserAgent.WithDefaultFields();
-
-        /// <summary>
-        /// The HTTP request.
-        /// </summary>
         private HttpWebRequest httpWebRequest;
 
         /// <summary>
@@ -110,7 +107,7 @@ namespace Klarna.Rest.Tests.OrderManagement
             this.httpWebRequest = (HttpWebRequest)WebRequest.Create(this.baseUrl);
             this.requestMock = MockRepository.GenerateStub<IRequestFactory>();
 
-            this.connector = ConnectorFactory.Create(this.requestMock, this.merchantId, this.secret, this.userAgent, this.baseUrl);
+            this.connector = ConnectorFactory.Create(this.requestMock, this.merchantId, this.secret, this.baseUrl);
             this.order = new Klarna.Rest.OrderManagement.Order(this.connector, this.orderId);
         }
 
@@ -122,7 +119,8 @@ namespace Klarna.Rest.Tests.OrderManagement
         /// Make sure that the request sent and retrieved data is correct when fetching the order.
         /// </summary>
         [Test]
-        public void TestFetch()
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1615:ElementReturnValueMustBeDocumented", Justification = "Reviewed.")]
+        public async Task TestFetch()
         {
             // Arrange
             int orderAmount = 1234;
@@ -135,11 +133,11 @@ namespace Klarna.Rest.Tests.OrderManagement
             WebHeaderCollection headers = new WebHeaderCollection();
             headers[HttpResponseHeader.ContentType] = "application/json";
 
-            IResponse fetchResponse = new Response(HttpStatusCode.OK, headers, json);
+            Task<IResponse> fetchResponse = Task.FromResult<IResponse>(new Response(HttpStatusCode.OK, headers, json));
             this.requestMock.Expect(x => x.Send(this.httpWebRequest, string.Empty)).Return(fetchResponse);
 
             // Act
-            Models.OrderData orderData = this.order.Fetch();
+            Models.OrderData orderData = await this.order.Fetch();
 
             // Assert
             this.requestMock.VerifyAllExpectations();
@@ -148,7 +146,6 @@ namespace Klarna.Rest.Tests.OrderManagement
             Assert.AreEqual(1, orderData.Captures.Count);
             Assert.AreEqual(this.captureId, orderData.Captures[0].CaptureId);
             Assert.AreEqual(description, orderData.Captures[0].Description);
-            Assert.AreEqual(0, this.httpWebRequest.ContentLength);
             TestsHelper.AssertRequest(this.merchantId, this.secret, this.httpWebRequest, HttpMethod.Get);
         }
 
@@ -156,22 +153,22 @@ namespace Klarna.Rest.Tests.OrderManagement
         /// Test acknowledge order managementMake sure that the request sent is correct when acknowledging an order.
         /// </summary>
         [Test]
-        public void TestAcknowledge()
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1615:ElementReturnValueMustBeDocumented", Justification = "Reviewed.")]
+        public async Task TestAcknowledge()
         {
             // Arrange
             this.requestMock.Stub(x => x.CreateRequest(this.baseUrl.ToString().TrimEnd('/') + this.path + '/' + this.orderId + "/acknowledge")).Return(this.httpWebRequest);
             WebHeaderCollection headers = new WebHeaderCollection();
             headers["Location"] = this.location;
 
-            IResponse response = new Response(HttpStatusCode.NoContent, headers, string.Empty);
+            Task<IResponse> response = Task.FromResult<IResponse>(new Response(HttpStatusCode.NoContent, headers, string.Empty));
             this.requestMock.Expect(x => x.Send(this.httpWebRequest, string.Empty)).Return(response);
 
             // Act
-            this.order.Acknowledge();
+            await this.order.Acknowledge();
 
             // Assert
             this.requestMock.VerifyAllExpectations();
-            Assert.AreEqual(0, this.httpWebRequest.ContentLength);
             TestsHelper.AssertRequest(this.merchantId, this.secret, this.httpWebRequest, HttpMethod.Post);
         }
 
@@ -179,22 +176,22 @@ namespace Klarna.Rest.Tests.OrderManagement
         /// Make sure that the request sent is correct when cancelling an order.
         /// </summary>
         [Test]
-        public void TestCancel()
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1615:ElementReturnValueMustBeDocumented", Justification = "Reviewed.")]
+        public async Task TestCancel()
         {
             // Arrange
             this.requestMock.Expect(x => x.CreateRequest(this.baseUrl.ToString().TrimEnd('/') + this.path + '/' + this.orderId + "/cancel")).Return(this.httpWebRequest);
             WebHeaderCollection headers = new WebHeaderCollection();
             headers["Location"] = this.location;
 
-            IResponse response = new Response(HttpStatusCode.NoContent, headers, string.Empty);
+            Task<IResponse> response = Task.FromResult<IResponse>(new Response(HttpStatusCode.NoContent, headers, string.Empty));
             this.requestMock.Expect(x => x.Send(this.httpWebRequest, string.Empty)).Return(response);
 
             // Act
-            this.order.Cancel();
+            await this.order.Cancel();
 
             // Assert
             this.requestMock.VerifyAllExpectations();
-            Assert.AreEqual(0, this.httpWebRequest.ContentLength);
             TestsHelper.AssertRequest(this.merchantId, this.secret, this.httpWebRequest, HttpMethod.Post);
         }
 
@@ -202,22 +199,22 @@ namespace Klarna.Rest.Tests.OrderManagement
         /// Make sure that the request sent is correct when extending authorization time.
         /// </summary>
         [Test]
-        public void TestExtendAuthorizationTime()
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1615:ElementReturnValueMustBeDocumented", Justification = "Reviewed.")]
+        public async Task TestExtendAuthorizationTime()
         {
             // Arrange
             this.requestMock.Expect(x => x.CreateRequest(this.baseUrl.ToString().TrimEnd('/') + this.path + '/' + this.orderId + "/extend-authorization-time")).Return(this.httpWebRequest);
             WebHeaderCollection headers = new WebHeaderCollection();
             headers["Location"] = this.location;
 
-            IResponse response = new Response(HttpStatusCode.NoContent, headers, string.Empty);
+            Task<IResponse> response = Task.FromResult<IResponse>(new Response(HttpStatusCode.NoContent, headers, string.Empty));
             this.requestMock.Expect(x => x.Send(this.httpWebRequest, string.Empty)).Return(response);
 
             // Act
-            this.order.ExtendAuthorizationTime();
+            await this.order.ExtendAuthorizationTime();
 
             // Assert
             this.requestMock.VerifyAllExpectations();
-            Assert.AreEqual(0, this.httpWebRequest.ContentLength);
             TestsHelper.AssertRequest(this.merchantId, this.secret, this.httpWebRequest, HttpMethod.Post);
         }
 
@@ -225,7 +222,8 @@ namespace Klarna.Rest.Tests.OrderManagement
         /// Make sure that the request sent is correct when releasing remaining authorization.
         /// </summary>
         [Test]
-        public void TestReleaseRemainingAuthorization()
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1615:ElementReturnValueMustBeDocumented", Justification = "Reviewed.")]
+        public async Task TestReleaseRemainingAuthorization()
         {
             // Arrange
             this.requestMock.Expect(x => x.CreateRequest(this.baseUrl.ToString().TrimEnd('/') + this.path + '/' + this.orderId + "/release-remaining-authorization")).Return(this.httpWebRequest);
@@ -233,15 +231,14 @@ namespace Klarna.Rest.Tests.OrderManagement
             WebHeaderCollection headers = new WebHeaderCollection();
             headers["Location"] = this.location;
 
-            IResponse response = new Response(HttpStatusCode.NoContent, headers, string.Empty);
+            Task<IResponse> response = Task.FromResult<IResponse>(new Response(HttpStatusCode.NoContent, headers, string.Empty));
             this.requestMock.Expect(x => x.Send(this.httpWebRequest, string.Empty)).Return(response);
 
             // Act
-            this.order.ReleaseRemainingAuthorization();
+            await this.order.ReleaseRemainingAuthorization();
 
             // Assert
             this.requestMock.VerifyAllExpectations();
-            Assert.AreEqual(0, this.httpWebRequest.ContentLength);
             TestsHelper.AssertRequest(this.merchantId, this.secret, this.httpWebRequest, HttpMethod.Post);
         }
 
@@ -249,7 +246,8 @@ namespace Klarna.Rest.Tests.OrderManagement
         /// Make sure that the request sent is correct when updating authorization.
         /// </summary>
         [Test]
-        public void TestUpdateAuthorization()
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1615:ElementReturnValueMustBeDocumented", Justification = "Reviewed.")]
+        public async Task TestUpdateAuthorization()
         {
             // Arrange
             UpdateAuthorization updateAuthorization = new UpdateAuthorization()
@@ -262,15 +260,14 @@ namespace Klarna.Rest.Tests.OrderManagement
             WebHeaderCollection headers = new WebHeaderCollection();
             headers["Location"] = this.location;
 
-            IResponse response = new Response(HttpStatusCode.NoContent, headers, string.Empty);
+            Task<IResponse> response = Task.FromResult<IResponse>(new Response(HttpStatusCode.NoContent, headers, string.Empty));
             this.requestMock.Expect(x => x.Send(this.httpWebRequest, updateAuthorization.ConvertToJson())).Return(response);
 
             // Act
-            this.order.UpdateAuthorization(updateAuthorization);
+            await this.order.UpdateAuthorization(updateAuthorization);
 
             // Assert
             this.requestMock.VerifyAllExpectations();
-            Assert.AreEqual(this.httpWebRequest.ContentLength, updateAuthorization.ConvertToJson().Length);
             TestsHelper.AssertRequest(this.merchantId, this.secret, this.httpWebRequest, HttpMethod.Patch);
         }
 
@@ -278,7 +275,8 @@ namespace Klarna.Rest.Tests.OrderManagement
         /// Make sure that the request sent is correct when updating merchant references.
         /// </summary>
         [Test]
-        public void TestUpdateMerchantReferences()
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1615:ElementReturnValueMustBeDocumented", Justification = "Reviewed.")]
+        public async Task TestUpdateMerchantReferences()
         {
             // Arrange
             UpdateMerchantReferences updateMerchantReferences = new UpdateMerchantReferences()
@@ -292,15 +290,14 @@ namespace Klarna.Rest.Tests.OrderManagement
             WebHeaderCollection headers = new WebHeaderCollection();
             headers["Location"] = this.location;
 
-            IResponse response = new Response(HttpStatusCode.NoContent, headers, string.Empty);
+            Task<IResponse> response = Task.FromResult<IResponse>(new Response(HttpStatusCode.NoContent, headers, string.Empty));
             this.requestMock.Expect(x => x.Send(this.httpWebRequest, updateMerchantReferences.ConvertToJson())).Return(response);
 
             // Act
-            this.order.UpdateMerchantReferences(updateMerchantReferences);
+            await this.order.UpdateMerchantReferences(updateMerchantReferences);
 
             // Assert
             this.requestMock.VerifyAllExpectations();
-            Assert.AreEqual(this.httpWebRequest.ContentLength, updateMerchantReferences.ConvertToJson().Length);
             TestsHelper.AssertRequest(this.merchantId, this.secret, this.httpWebRequest, HttpMethod.Patch);
         }
 
@@ -308,7 +305,8 @@ namespace Klarna.Rest.Tests.OrderManagement
         /// Make sure that the request sent is correct when updating customer details.
         /// </summary>
         [Test]
-        public void TestUpdateCustomerDetails()
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1615:ElementReturnValueMustBeDocumented", Justification = "Reviewed.")]
+        public async Task TestUpdateCustomerDetails()
         {
             // Arrange
             UpdateCustomerDetails updateCustomerDetails = new UpdateCustomerDetails()
@@ -322,15 +320,14 @@ namespace Klarna.Rest.Tests.OrderManagement
             WebHeaderCollection headers = new WebHeaderCollection();
             headers["Location"] = this.location;
 
-            IResponse response = new Response(HttpStatusCode.NoContent, headers, string.Empty);
+            Task<IResponse> response = Task.FromResult<IResponse>(new Response(HttpStatusCode.NoContent, headers, string.Empty));
             this.requestMock.Expect(x => x.Send(this.httpWebRequest, updateCustomerDetails.ConvertToJson())).Return(response);
 
             // Act
-            this.order.UpdateCustomerDetails(updateCustomerDetails);
+            await this.order.UpdateCustomerDetails(updateCustomerDetails);
 
             // Assert
             this.requestMock.VerifyAllExpectations();
-            Assert.AreEqual(this.httpWebRequest.ContentLength, updateCustomerDetails.ConvertToJson().Length);
             TestsHelper.AssertRequest(this.merchantId, this.secret, this.httpWebRequest, HttpMethod.Patch);
         }
 
@@ -338,7 +335,8 @@ namespace Klarna.Rest.Tests.OrderManagement
         /// Make sure that the request sent is correct when performing a refund.
         /// </summary>
         [Test]
-        public void TestRefund()
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1615:ElementReturnValueMustBeDocumented", Justification = "Reviewed.")]
+        public async Task TestRefund()
         {
             // Arrange
             Refund refund = new Refund()
@@ -352,15 +350,14 @@ namespace Klarna.Rest.Tests.OrderManagement
             WebHeaderCollection headers = new WebHeaderCollection();
             headers["Location"] = this.location;
 
-            IResponse response = new Response(HttpStatusCode.NoContent, headers, string.Empty);
+            Task<IResponse> response = Task.FromResult<IResponse>(new Response(HttpStatusCode.NoContent, headers, string.Empty));
             this.requestMock.Expect(x => x.Send(this.httpWebRequest, refund.ConvertToJson())).Return(response);
 
             // Act
-            this.order.Refund(refund);
+            await this.order.Refund(refund);
 
             // Assert
             this.requestMock.VerifyAllExpectations();
-            Assert.AreEqual(this.httpWebRequest.ContentLength, refund.ConvertToJson().Length);
             TestsHelper.AssertRequest(this.merchantId, this.secret, this.httpWebRequest, HttpMethod.Post);
         }
 
@@ -368,7 +365,8 @@ namespace Klarna.Rest.Tests.OrderManagement
         /// Make sure that the request sent is correct when performing a refund.
         /// </summary>
         [Test]
-        public void TestRefundCreated()
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1615:ElementReturnValueMustBeDocumented", Justification = "Reviewed.")]
+        public async Task TestRefundCreated()
         {
             // Arrange
             Refund refund = new Refund()
@@ -382,15 +380,14 @@ namespace Klarna.Rest.Tests.OrderManagement
             WebHeaderCollection headers = new WebHeaderCollection();
             headers["Location"] = this.location;
 
-            IResponse response = new Response(HttpStatusCode.Created, headers, string.Empty);
+            Task<IResponse> response = Task.FromResult<IResponse>(new Response(HttpStatusCode.Created, headers, string.Empty));
             this.requestMock.Expect(x => x.Send(this.httpWebRequest, refund.ConvertToJson())).Return(response);
 
             // Act
-            this.order.Refund(refund);
+            await this.order.Refund(refund);
 
             // Assert
             this.requestMock.VerifyAllExpectations();
-            Assert.AreEqual(this.httpWebRequest.ContentLength, refund.ConvertToJson().Length);
             TestsHelper.AssertRequest(this.merchantId, this.secret, this.httpWebRequest, HttpMethod.Post);
         }
 

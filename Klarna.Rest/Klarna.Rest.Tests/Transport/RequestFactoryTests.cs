@@ -20,9 +20,11 @@
 #endregion
 namespace Klarna.Rest.Tests.Transport
 {
+    using System.Diagnostics.CodeAnalysis;
     using System.IO;
     using System.Net;
     using System.Text;
+    using System.Threading.Tasks;
     using Klarna.Rest.Transport;
     using NUnit.Framework;
     using Rhino.Mocks;
@@ -100,11 +102,12 @@ namespace Klarna.Rest.Tests.Transport
         /// Basic test of Send.
         /// </summary>
         [Test]
-        public void Transport_RequestFactory_Send()
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1615:ElementReturnValueMustBeDocumented", Justification = "Reviewed.")]
+        public async Task Transport_RequestFactory_Send()
         {
-            this.request.Stub(x => x.GetResponse()).Return(this.response);
+            this.request.Stub(x => x.GetResponseAsync()).Return(Task.FromResult<WebResponse>(this.response));
 
-            IResponse response = this.factory.Send(this.request, null);
+            IResponse response = await this.factory.Send(this.request, null);
 
             Assert.AreEqual(HttpStatusCode.Created, response.Status);
             Assert.AreEqual("http://somewhere/123", response.Headers["Location"]);
@@ -115,7 +118,8 @@ namespace Klarna.Rest.Tests.Transport
         /// Basic test of Send with a payload.
         /// </summary>
         [Test]
-        public void Transport_RequestFactory_SendWithPayload()
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1615:ElementReturnValueMustBeDocumented", Justification = "Reviewed.")]
+        public async Task Transport_RequestFactory_SendWithPayload()
         {
             string payload = "{\"something\": \"else\"}";
             var bytes = Encoding.UTF8.GetBytes(payload);
@@ -123,14 +127,13 @@ namespace Klarna.Rest.Tests.Transport
             var stream = MockRepository.GenerateStub<Stream>();
             stream.Expect(x => x.Write(bytes, 0, 21));
 
-            this.request.Stub(x => x.GetRequestStream()).Return(stream);
-            this.request.Stub(x => x.GetResponse()).Return(this.response);
+            this.request.Stub(x => x.GetRequestStreamAsync()).Return(Task.FromResult(stream));
+            this.request.Stub(x => x.GetResponseAsync()).Return(Task.FromResult<WebResponse>(this.response));
 
-            IResponse response = this.factory.Send(this.request, payload);
+            IResponse response = await this.factory.Send(this.request, payload);
 
             stream.VerifyAllExpectations();
 
-            Assert.AreEqual(21, this.request.ContentLength);
             Assert.AreEqual(HttpStatusCode.Created, response.Status);
             Assert.AreEqual("http://somewhere/123", response.Headers["Location"]);
             Assert.AreEqual("{}", response.Payload);
@@ -140,6 +143,7 @@ namespace Klarna.Rest.Tests.Transport
         /// Ensure that the ErrorMessage model is populated correctly for API errors.
         /// </summary>
         [Test]
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1615:ElementReturnValueMustBeDocumented", Justification = "Reviewed.")]
         public void Transport_RequestFactory_SendWithApiError()
         {
             this.response.BackToRecord(BackToRecordOptions.All);
@@ -157,10 +161,9 @@ namespace Klarna.Rest.Tests.Transport
 
             WebException exception = new WebException("The remote server returned an error: (400) Bad Request.", null, WebExceptionStatus.Success, this.response);
 
-            this.request.Stub(x => x.GetResponse()).Throw(exception);
+            this.request.Stub(x => x.GetResponseAsync()).Throw(exception);
 
-            ApiException ex = Assert.Throws<ApiException>(
-                delegate { this.factory.Send(this.request, null); });
+            ApiException ex = Assert.ThrowsAsync<ApiException>(() => this.factory.Send(this.request, null));
 
             Assert.AreEqual("The remote server returned an error: (400) Bad Request.", ex.Message);
             Assert.AreEqual(HttpStatusCode.BadRequest, ex.StatusCode);
@@ -191,10 +194,9 @@ namespace Klarna.Rest.Tests.Transport
 
             WebException exception = new WebException("The remote server returned an error: (401) Unauthorized.", null, WebExceptionStatus.Success, this.response);
 
-            this.request.Stub(x => x.GetResponse()).Throw(exception);
+            this.request.Stub(x => x.GetResponseAsync()).Throw(exception);
 
-            WebException ex = Assert.Throws<WebException>(
-                delegate { this.factory.Send(this.request, null); });
+            WebException ex = Assert.ThrowsAsync<WebException>(() => this.factory.Send(this.request, null));
 
             Assert.AreSame(exception, ex);
         }
@@ -220,10 +222,9 @@ namespace Klarna.Rest.Tests.Transport
 
             WebException exception = new WebException("The remote server returned an error: (500) Internal Serve rError.", null, WebExceptionStatus.Success, this.response);
 
-            this.request.Stub(x => x.GetResponse()).Throw(exception);
+            this.request.Stub(x => x.GetResponseAsync()).Throw(exception);
 
-            WebException ex = Assert.Throws<WebException>(
-                delegate { this.factory.Send(this.request, null); });
+            WebException ex = Assert.ThrowsAsync<WebException>(() => this.factory.Send(this.request, null));
 
             Assert.AreSame(exception, ex);
         }
@@ -236,10 +237,9 @@ namespace Klarna.Rest.Tests.Transport
         {
             WebException exception = new WebException("Whatever", null, WebExceptionStatus.Timeout, null);
 
-            this.request.Stub(x => x.GetResponse()).Throw(exception);
+            this.request.Stub(x => x.GetResponseAsync()).Throw(exception);
 
-            WebException ex = Assert.Throws<WebException>(
-                delegate { this.factory.Send(this.request, null); });
+            WebException ex = Assert.ThrowsAsync<WebException>(() => this.factory.Send(this.request, null));
 
             Assert.AreSame(exception, ex);
         }
@@ -262,10 +262,9 @@ namespace Klarna.Rest.Tests.Transport
 
             WebException exception = new WebException("The remote server returned an error: (400) Bad Request.", null, WebExceptionStatus.Success, this.response);
 
-            this.request.Stub(x => x.GetResponse()).Throw(exception);
+            this.request.Stub(x => x.GetResponseAsync()).Throw(exception);
 
-            ApiException ex = Assert.Throws<ApiException>(
-                delegate { this.factory.Send(this.request, null); });
+            ApiException ex = Assert.ThrowsAsync<ApiException>(() => this.factory.Send(this.request, null));
 
             Assert.IsNull(ex.ErrorMessage.ErrorCode);
             Assert.IsNull(ex.ErrorMessage.CorrelationId);

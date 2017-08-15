@@ -22,7 +22,6 @@ namespace Klarna.Rest.Transport
 {
     using System;
     using System.Net;
-    using System.Runtime.Serialization;
     using Klarna.Rest.Models;
 
     /// <summary>
@@ -42,15 +41,6 @@ namespace Klarna.Rest.Transport
         {
             this.StatusCode = statusCode;
             this.ErrorMessage = errorMessage;
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ApiException" /> class.
-        /// </summary>
-        /// <param name="serializationInfo">Serialization info</param>
-        /// <param name="streamingContext">Streaming context</param>
-        protected ApiException(SerializationInfo serializationInfo, StreamingContext streamingContext) : base(serializationInfo, streamingContext)
-        {
         }
 
         /// <summary>

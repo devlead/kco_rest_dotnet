@@ -20,7 +20,9 @@
 #endregion
 namespace Klarna.Rest.Tests.OrderManagement
 {
+    using System.Diagnostics.CodeAnalysis;
     using System.Net;
+    using System.Threading.Tasks;
     using Klarna.Rest.Models;
     using Klarna.Rest.Models.Requests;
     using Klarna.Rest.Transport;
@@ -122,7 +124,8 @@ namespace Klarna.Rest.Tests.OrderManagement
         /// Basic test of Fetch.
         /// </summary>
         [Test]
-        public void Order_Fetch_Basic()
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1615:ElementReturnValueMustBeDocumented", Justification = "Reviewed.")]
+        public async Task Order_Fetch_Basic()
         {
             // Arrange
             OrderData orderData = TestsHelper.GetOrderData();
@@ -136,7 +139,7 @@ namespace Klarna.Rest.Tests.OrderManagement
             responseMock.Stub(x => x.Headers).Return(headers);
 
             // Act
-            var returnedCheckoutOrder = this.order.Fetch();
+            var returnedCheckoutOrder = await this.order.Fetch();
 
             // Assert
             Assert.AreEqual(orderData.PurchaseCountry, returnedCheckoutOrder.PurchaseCountry);
@@ -147,58 +150,63 @@ namespace Klarna.Rest.Tests.OrderManagement
         /// Basic test of Acknowledge.
         /// </summary>
         [Test]
-        public void Order_Acknowledge_Basic()
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1615:ElementReturnValueMustBeDocumented", Justification = "Reviewed.")]
+        public async Task Order_Acknowledge_Basic()
         {
             // Arrange
             TestsHelper.Mock(HttpMethod.Post, this.order.Location + "/acknowledge", string.Empty, HttpStatusCode.NoContent, this.connectorMock);
 
             // Act
-            this.order.Acknowledge();
+            await this.order.Acknowledge();
         }
 
         /// <summary>
         /// Basic test of Cancel.
         /// </summary>
         [Test]
-        public void Order_Cancel_Basic()
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1615:ElementReturnValueMustBeDocumented", Justification = "Reviewed.")]
+        public async Task Order_Cancel_Basic()
         {
             // Arrange
             TestsHelper.Mock(HttpMethod.Post, this.order.Location + "/cancel", string.Empty, HttpStatusCode.NoContent, this.connectorMock);
 
-            this.order.Cancel();
+            await this.order.Cancel();
         }
 
         /// <summary>
         /// Basic test of UpdateAuthorization.
         /// </summary>
         [Test]
-        public void OrderManagement_Order_UpdateAuthorization_Basic()
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1615:ElementReturnValueMustBeDocumented", Justification = "Reviewed.")]
+        public async Task OrderManagement_Order_UpdateAuthorization_Basic()
         {
             // Arrange
             UpdateAuthorization updateAuthorization = TestsHelper.GetUpdateAuthorization();
 
             TestsHelper.Mock(HttpMethod.Patch, this.order.Location + "/authorization", updateAuthorization.ConvertToJson(), HttpStatusCode.NoContent, this.connectorMock);
 
-            this.order.UpdateAuthorization(updateAuthorization);
+            await this.order.UpdateAuthorization(updateAuthorization);
         }
 
         /// <summary>
         /// Basic test of ExtendAuthorizationTime.
         /// </summary>
         [Test]
-        public void Order_ExtendAuthorizationTime_Basic()
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1615:ElementReturnValueMustBeDocumented", Justification = "Reviewed.")]
+        public async Task Order_ExtendAuthorizationTime_Basic()
         {
             // Arrange
             TestsHelper.Mock(HttpMethod.Post, this.order.Location + "/extend-authorization-time", string.Empty, HttpStatusCode.NoContent, this.connectorMock);
 
-            this.order.ExtendAuthorizationTime();
+            await this.order.ExtendAuthorizationTime();
         }
 
         /// <summary>
         /// Basic test of UpdateMerchantReferences.
         /// </summary>
         [Test]
-        public void Order_UpdateMerchantReferences_Basic()
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1615:ElementReturnValueMustBeDocumented", Justification = "Reviewed.")]
+        public async Task Order_UpdateMerchantReferences_Basic()
         {
             // Arrange
             UpdateMerchantReferences updateMerchantReferences = TestsHelper.GetUpdateMerchantReferences();
@@ -206,61 +214,65 @@ namespace Klarna.Rest.Tests.OrderManagement
             TestsHelper.Mock(HttpMethod.Patch, this.order.Location + "/merchant-references", updateMerchantReferences.ConvertToJson(), HttpStatusCode.NoContent, this.connectorMock);
 
             // Act
-            this.order.UpdateMerchantReferences(updateMerchantReferences);
+            await this.order.UpdateMerchantReferences(updateMerchantReferences);
         }
 
         /// <summary>
         /// Basic test of UpdateCustomerDetails.
         /// </summary>
         [Test]
-        public void Order_UpdateCustomerDetails_Basic()
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1615:ElementReturnValueMustBeDocumented", Justification = "Reviewed.")]
+        public async Task Order_UpdateCustomerDetails_Basic()
         {
             // Arrange
             UpdateCustomerDetails updateCustomerDetails = TestsHelper.GetUpdateCustomerDetails();
 
             TestsHelper.Mock(HttpMethod.Patch, this.order.Location + "/customer-details", updateCustomerDetails.ConvertToJson(), HttpStatusCode.NoContent, this.connectorMock);
 
-            this.order.UpdateCustomerDetails(updateCustomerDetails);
+            await this.order.UpdateCustomerDetails(updateCustomerDetails);
         }
 
         /// <summary>
         /// Basic test of Refund.
         /// </summary>
         [Test]
-        public void Order_Refund_Basic()
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1615:ElementReturnValueMustBeDocumented", Justification = "Reviewed.")]
+        public async Task Order_Refund_Basic()
         {
             // Arrange
             Refund refund = TestsHelper.GetRefund();
 
             TestsHelper.Mock(HttpMethod.Post, this.order.Location + "/refunds", refund.ConvertToJson(), HttpStatusCode.NoContent, this.connectorMock);
 
-            this.order.Refund(refund);
+            await this.order.Refund(refund);
         }
 
         /// <summary>
         /// Basic test of Refund.
         /// </summary>
         [Test]
-        public void Order_Refund_Basic_Created()
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1615:ElementReturnValueMustBeDocumented", Justification = "Reviewed.")]
+        public async Task Order_Refund_Basic_Created()
         {
             // Arrange
             Refund refund = TestsHelper.GetRefund();
 
             TestsHelper.Mock(HttpMethod.Post, this.order.Location + "/refunds", refund.ConvertToJson(), HttpStatusCode.Created, this.connectorMock);
 
-            this.order.Refund(refund);
+            await this.order.Refund(refund);
         }
 
         /// <summary>
         /// Basic test of ReleaseRemainingAuthorization.
         /// </summary>
         [Test]
-        public void Order_ReleaseRemainingAuthorization_Basic()
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1615:ElementReturnValueMustBeDocumented", Justification = "Reviewed.")]
+        public async Task Order_ReleaseRemainingAuthorization_Basic()
         {
             // Arrange
             TestsHelper.Mock(HttpMethod.Post, this.order.Location + "/release-remaining-authorization", string.Empty, HttpStatusCode.NoContent, this.connectorMock);
 
-            this.order.ReleaseRemainingAuthorization();
+            await this.order.ReleaseRemainingAuthorization();
         }
 
         #endregion

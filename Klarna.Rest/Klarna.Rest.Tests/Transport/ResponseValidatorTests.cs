@@ -21,6 +21,7 @@
 namespace Klarna.Rest.Tests.Transport
 {
     using System;
+    using System.Diagnostics.CodeAnalysis;
     using System.Net;
     using Klarna.Rest.Transport;
     using NUnit.Framework;
@@ -150,11 +151,13 @@ namespace Klarna.Rest.Tests.Transport
         /// Exception test of ContentType.
         /// </summary>
         [Test]
-        [ExpectedException(typeof(Exception), ExpectedMessage = "Response has no Content-Type header.")]
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1615:ElementReturnValueMustBeDocumented", Justification = "Reviewed.")]
         public void ResponseValidator_ContentType_ExceptionMissing()
         {
             this.headers.Clear();
-            this.responseValidator.ContentType("different/contentType");
+            Assert.Throws<Exception>(
+                () => this.responseValidator.ContentType("different/contentType"),
+                "Response has no Content-Type header.");
         }
 
         #endregion

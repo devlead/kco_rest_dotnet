@@ -24,6 +24,7 @@ namespace Klarna.Rest.Checkout
     using System.Net;
     using Klarna.Rest.Models;
     using Klarna.Rest.Transport;
+    using System.Threading.Tasks;
 
     /// <summary>
     /// Checkout order resource.
@@ -69,9 +70,9 @@ namespace Klarna.Rest.Checkout
         /// Creates the resource.
         /// </summary>
         /// <param name="checkoutOrderData">the order data</param>
-        public void Create(CheckoutOrderData checkoutOrderData)
+        public async Task Create(CheckoutOrderData checkoutOrderData)
         {
-            this.Location = Post(this.Path, checkoutOrderData)
+            this.Location = (await Post(this.Path, checkoutOrderData))
                 .Status(HttpStatusCode.Created)
                 .Location;
         }
@@ -81,9 +82,9 @@ namespace Klarna.Rest.Checkout
         /// </summary>
         /// <param name="checkoutOrderData">the order data</param>
         /// <returns>the updated checkout order data</returns>
-        public CheckoutOrderData Update(CheckoutOrderData checkoutOrderData)
+        public async Task<CheckoutOrderData> Update(CheckoutOrderData checkoutOrderData)
         {
-            return Post(this.Location.ToString(), checkoutOrderData)
+            return (await Post(this.Location.ToString(), checkoutOrderData))
                 .Status(HttpStatusCode.OK)
                 .ContentType("application/json")
                 .Response.Data<CheckoutOrderData>();
@@ -93,9 +94,9 @@ namespace Klarna.Rest.Checkout
         /// Fetches the resource.
         /// </summary>
         /// <returns>the checkout order data</returns>
-        public CheckoutOrderData Fetch()
+        public async Task<CheckoutOrderData> Fetch()
         {
-            return Get(this.Location.ToString())
+            return (await Get(this.Location.ToString()))
                 .Status(HttpStatusCode.OK)
                 .ContentType("application/json")
                 .Response.Data<CheckoutOrderData>();

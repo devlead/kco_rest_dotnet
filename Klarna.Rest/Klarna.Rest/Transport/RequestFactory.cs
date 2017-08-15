@@ -25,19 +25,21 @@ namespace Klarna.Rest.Transport
     using System.Text;
     using Klarna.Rest.Models;
     using Newtonsoft.Json;
+    using System.Threading.Tasks;
 
     /// <summary>
     /// The HTTP request factory interface.
     /// </summary>
     internal class RequestFactory : IRequestFactory
     {
-        /// <summary>
+/// <summary>
         /// Creates a HttpWebRequest object.
         /// </summary>
         /// <param name="url">request url</param>
         /// <returns>a HTTP request object</returns>
         public HttpWebRequest CreateRequest(string url)
         {
+
             // Create the request with correct method to use
             var request = (HttpWebRequest)WebRequest.Create(url);
 
@@ -50,16 +52,18 @@ namespace Klarna.Rest.Transport
         /// <param name="request">the HTTP request to send</param>
         /// <param name="payload">the payload to send if this is a POST or a PATCH</param>
         /// <returns>the response</returns>
-        public IResponse Send(HttpWebRequest request, string payload)
+        public async Task<IResponse> Send(HttpWebRequest request, string payload)
         {
-            if (!string.IsNullOrEmpty(payload))
-            {
-                byte[] bytes = Encoding.UTF8.GetBytes(payload);
-                request.ContentLength = bytes.Length;
 
-                using (Stream requestStream = request.GetRequestStream())
+            var content = string.IsNullOrEmpty(payload)
+                ? null
+                : Encoding.UTF8.GetBytes(payload);
+
+            if (content?.Length>0)
+            {
+                using (Stream requestStream = await request.GetRequestStreamAsync())
                 {
-                    requestStream.Write(bytes, 0, bytes.Length);
+                    requestStream.Write(content, 0, content.Length);
                 }
             }
 
@@ -67,9 +71,10 @@ namespace Klarna.Rest.Transport
 
             try
             {
-                webResponse = (HttpWebResponse)request.GetResponse();
-
-                return new Response(webResponse.StatusCode, webResponse.Headers, this.Json(webResponse));
+                using (webResponse = (HttpWebResponse)await request.GetResponseAsync())
+                {
+                    return new Response(webResponse.StatusCode, webResponse.Headers, this.Json(webResponse));
+                }
             }
             catch (WebException ex)
             {
@@ -94,13 +99,6 @@ namespace Klarna.Rest.Transport
 
                 throw new ApiException(ex.Message, webResponse.StatusCode, errorMessage, ex);
             }
-            finally
-            {
-                if (webResponse != null)
-                {
-                    webResponse.Close();
-                }
-            }
         }
 
         /// <summary>
@@ -111,7 +109,7 @@ namespace Klarna.Rest.Transport
         private string Json(HttpWebResponse response)
         {
             Stream webStream = response.GetResponseStream();
-            StreamReader responseReader = new StreamReader(webStream);
+            StreamReader responseReader = new StreamReader(webStream, Encoding.UTF8);
             return responseReader.ReadToEnd();
         }
     }

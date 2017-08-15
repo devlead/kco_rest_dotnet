@@ -21,7 +21,9 @@
 namespace Klarna.Rest.Tests.Checkout
 {
     using System;
+    using System.Diagnostics.CodeAnalysis;
     using System.Net;
+    using System.Threading.Tasks;
     using Klarna.Rest.Models;
     using Klarna.Rest.Transport;
     using NUnit.Framework;
@@ -108,7 +110,8 @@ namespace Klarna.Rest.Tests.Checkout
         /// Basic test of Create.
         /// </summary>
         [Test]
-        public void CheckoutOrder_Create_Basic()
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1615:ElementReturnValueMustBeDocumented", Justification = "Reviewed.")]
+        public async Task CheckoutOrder_Create_Basic()
         {
             // Arrange
             CheckoutOrderData checkoutOrderData = TestsHelper.GetCheckoutOrderData1();
@@ -123,7 +126,7 @@ namespace Klarna.Rest.Tests.Checkout
             responseMock.Stub(x => x.Headers).Return(headers);
 
             // Act
-            this.order.Create(checkoutOrderData);
+            await this.order.Create(checkoutOrderData);
 
             // Assert
             Assert.AreEqual(newTestLocation, this.order.Location);
@@ -133,7 +136,8 @@ namespace Klarna.Rest.Tests.Checkout
         /// Basic test of Update.
         /// </summary>
         [Test]
-        public void CheckoutOrder_Update_Basic()
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1615:ElementReturnValueMustBeDocumented", Justification = "Reviewed.")]
+        public async Task CheckoutOrder_Update_Basic()
         {
             // Arrange
             CheckoutOrderData checkoutOrderData1 = TestsHelper.GetCheckoutOrderData1();
@@ -149,7 +153,7 @@ namespace Klarna.Rest.Tests.Checkout
             responseMock.Stub(x => x.Headers).Return(headers);
 
             // Act
-            var returnedCheckoutOrderData = this.order.Update(checkoutOrderData1);
+            var returnedCheckoutOrderData = await this.order.Update(checkoutOrderData1);
 
             // Assert
             Assert.AreEqual(checkoutOrderData2.PurchaseCountry, returnedCheckoutOrderData.PurchaseCountry);
@@ -160,7 +164,8 @@ namespace Klarna.Rest.Tests.Checkout
         /// Basic test of Fetch.
         /// </summary>
         [Test]
-        public void CheckoutOrder_Fetch_Basic()
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1615:ElementReturnValueMustBeDocumented", Justification = "Reviewed.")]
+        public async Task CheckoutOrder_Fetch_Basic()
         {
             // Arrange
             CheckoutOrderData checkoutOrderData = TestsHelper.GetCheckoutOrderData1();
@@ -174,7 +179,7 @@ namespace Klarna.Rest.Tests.Checkout
             responseMock.Stub(x => x.Headers).Return(headers);
 
             // Act
-            var returnedCheckoutOrderData = this.order.Fetch();
+            var returnedCheckoutOrderData = await this.order.Fetch();
 
             // Assert
             Assert.AreEqual(checkoutOrderData.PurchaseCountry, returnedCheckoutOrderData.PurchaseCountry);

@@ -110,7 +110,6 @@ namespace Klarna.Rest.Tests
             Client client = new Client("0", "sharedSecret", new Uri("https://localhost/path"));
 
             Assert.NotNull(client.Connector);
-            Assert.NotNull(client.Connector.UserAgent);
         }
 
         /// <summary>

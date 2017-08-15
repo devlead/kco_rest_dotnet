@@ -21,12 +21,14 @@
 namespace Klarna.Rest.Transport
 {
     using System.Net;
+    using System.Threading.Tasks;
 
     /// <summary>
     /// The HTTP request factory interface.
     /// </summary>
-    internal interface IRequestFactory
+    public interface IRequestFactory
     {
+
         /// <summary>
         /// Creates a HttpWebRequest object.
         /// </summary>
@@ -40,6 +42,6 @@ namespace Klarna.Rest.Transport
         /// <param name="request">the HTTP request to send</param>
         /// <param name="payload">the payload to send if this is a POST</param>
         /// <returns>the response</returns>
-        IResponse Send(HttpWebRequest request, string payload);
+        Task<IResponse> Send(HttpWebRequest request, string payload);
     }
 }

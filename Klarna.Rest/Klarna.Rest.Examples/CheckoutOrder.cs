@@ -102,7 +102,7 @@ namespace Klarna.Rest.Examples
                 try
                 {
                     checkout.Create(orderData);
-                    orderData = checkout.Fetch();
+                    orderData = AsyncHelpers.RunSync(() => checkout.Fetch());
 
                     string orderID = orderData.OrderId;
                 }
@@ -212,7 +212,7 @@ namespace Klarna.Rest.Examples
                 try
                 {
                     checkout.Create(orderData);
-                    orderData = checkout.Fetch();
+                    orderData = AsyncHelpers.RunSync(() => checkout.Fetch());
 
                     string orderID = orderData.OrderId;
                     ExtraMerchantData emd = orderData.Attachment;
@@ -255,7 +255,7 @@ namespace Klarna.Rest.Examples
 
                 try
                 {
-                    CheckoutOrderData orderData = order.Fetch();
+                    CheckoutOrderData orderData = AsyncHelpers.RunSync(()=>order.Fetch());
                 }
                 catch (ApiException ex)
                 {
@@ -341,7 +341,7 @@ namespace Klarna.Rest.Examples
 
                 try
                 {
-                    orderData = checkout.Update(orderData);
+                    orderData = AsyncHelpers.RunSync(() => checkout.Update(orderData));
                 }
                 catch (ApiException ex)
                 {

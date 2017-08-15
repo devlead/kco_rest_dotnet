@@ -25,6 +25,7 @@ namespace Klarna.Rest.OrderManagement
     using Klarna.Rest.Models;
     using Klarna.Rest.Models.Requests;
     using Klarna.Rest.Transport;
+    using System.Threading.Tasks;
 
     /// <summary>
     /// Capture resource.
@@ -70,9 +71,9 @@ namespace Klarna.Rest.OrderManagement
         /// Creates the resource.
         /// </summary>
         /// <param name="captureData">the capture data</param>
-        public void Create(CaptureData captureData)
+        public async Task Create(CaptureData captureData)
         {
-            this.Location = this.Post(Location.ToString(), captureData)
+            this.Location = (await this.Post(Location.ToString(), captureData))
                 .Status(HttpStatusCode.Created)
                 .Location;
         }
@@ -81,9 +82,9 @@ namespace Klarna.Rest.OrderManagement
         /// Fetches the capture.
         /// </summary>
         /// <returns>the capture data</returns>
-        public CaptureData Fetch()
+        public async Task<CaptureData> Fetch()
         {
-            return Get(Location.ToString())
+            return (await Get(Location.ToString()))
                 .Status(HttpStatusCode.OK)
                 .ContentType("application/json")
                 .Response.Data<CaptureData>();
@@ -93,9 +94,9 @@ namespace Klarna.Rest.OrderManagement
         /// Appends shipping information to the capture.
         /// </summary>
         /// <param name="shippingInfo">the shipping info</param>
-        public void AddShippingInfo(AddShippingInfo shippingInfo)
+        public async Task AddShippingInfo(AddShippingInfo shippingInfo)
         {
-            this.Post(this.Location + "/shipping-info", shippingInfo)
+            (await this.Post(this.Location + "/shipping-info", shippingInfo))
                 .Status(HttpStatusCode.NoContent);
         }
 
@@ -103,18 +104,18 @@ namespace Klarna.Rest.OrderManagement
         /// Updates the customers details.
         /// </summary>
         /// <param name="updateCustomerDetails">the customer details</param>
-        public void UpdateCustomerDetails(UpdateCustomerDetails updateCustomerDetails)
+        public async Task UpdateCustomerDetails(UpdateCustomerDetails updateCustomerDetails)
         {
-            this.Patch(this.Location + "/customer-details", updateCustomerDetails)
+            (await this.Patch(this.Location + "/customer-details", updateCustomerDetails))
                 .Status(HttpStatusCode.NoContent);
         }
 
         /// <summary>
         /// Trigger send outs for this capture.
         /// </summary>
-        public void TriggerSendOut()
+        public async Task TriggerSendOut()
         {
-            this.Post(this.Location + "/trigger-send-out", null)
+            (await this.Post(this.Location + "/trigger-send-out", null))
                 .Status(HttpStatusCode.NoContent);
         }
 

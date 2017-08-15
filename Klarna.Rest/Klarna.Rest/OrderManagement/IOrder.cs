@@ -22,6 +22,7 @@ namespace Klarna.Rest.OrderManagement
 {
     using Klarna.Rest.Models;
     using Klarna.Rest.Models.Requests;
+    using System.Threading.Tasks;
 
     /// <summary>
     /// Checkout order resource interface.
@@ -32,50 +33,50 @@ namespace Klarna.Rest.OrderManagement
         /// Fetches the order.
         /// </summary>
         /// <returns>the order data object</returns>
-        OrderData Fetch();
+        Task<OrderData> Fetch();
 
         /// <summary>
         /// Acknowledges the order.
         /// </summary>
-        void Acknowledge();
+        Task Acknowledge();
 
         /// <summary>
         /// Cancels the order.
         /// </summary>
-        void Cancel();
+        Task Cancel();
 
         /// <summary>
         /// Updates the authorization data.
         /// </summary>
         /// <param name="updateAuthorization">the updateAuthorization</param>
-        void UpdateAuthorization(UpdateAuthorization updateAuthorization);
+        Task UpdateAuthorization(UpdateAuthorization updateAuthorization);
 
         /// <summary>
         /// Extends the authorization time.
         /// </summary>
-        void ExtendAuthorizationTime();
+        Task ExtendAuthorizationTime();
 
         /// <summary>
         /// Update the merchant references.
         /// </summary>
         /// <param name="updateMerchantReferences">the update merchant references</param>
-        void UpdateMerchantReferences(UpdateMerchantReferences updateMerchantReferences);
+        Task UpdateMerchantReferences(UpdateMerchantReferences updateMerchantReferences);
 
         /// <summary>
         /// Updates the customer details.
         /// </summary>
         /// <param name="updateCustomerDetails">the order</param>
-        void UpdateCustomerDetails(UpdateCustomerDetails updateCustomerDetails);
+        Task UpdateCustomerDetails(UpdateCustomerDetails updateCustomerDetails);
 
         /// <summary>
         /// Refunds an amount of a captured order.
         /// </summary>
         /// <param name="order">the order</param>
-        void Refund(Refund order);
+        Task Refund(Refund order);
 
         /// <summary>
         /// Release the remaining authorization for an order.
         /// </summary>
-        void ReleaseRemainingAuthorization();
+        Task ReleaseRemainingAuthorization();
     }
 }

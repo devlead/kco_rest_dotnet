@@ -21,6 +21,7 @@
 namespace Klarna.Rest.Transport
 {
     using System.Net;
+    using System.Threading.Tasks;
 
     /// <summary>
     /// HTTP transport connector interface used to authenticate and make HTTP requests against the Klarna APIs.
@@ -28,18 +29,12 @@ namespace Klarna.Rest.Transport
     public interface IConnector
     {
         /// <summary>
-        /// Gets the user agent.
-        /// </summary>
-        UserAgent UserAgent { get; }
-
-        /// <summary>
         /// Creates a request object.
         /// </summary>
         /// <param name="url">the url</param>
         /// <param name="method">the HTTP method</param>
-        /// <param name="payload">the payload</param>
         /// <returns>the HTTP request</returns>
-        HttpWebRequest CreateRequest(string url, HttpMethod method, string payload);
+        HttpWebRequest CreateRequest(string url, HttpMethod method);
 
         /// <summary>
         /// Sends the request.
@@ -47,6 +42,6 @@ namespace Klarna.Rest.Transport
         /// <param name="request">the request</param>
         /// <param name="payload">the payload</param>
         /// <returns>the response</returns>
-        IResponse Send(HttpWebRequest request, string payload);
+        Task<IResponse> Send(HttpWebRequest request, string payload);
     }
 }

@@ -133,7 +133,7 @@ namespace Klarna.Rest.Examples
 
                 try
                 {
-                    CaptureData captureData = capture.Fetch();
+                    CaptureData captureData = AsyncHelpers.RunSync(() => capture.Fetch());
                 }
                 catch (ApiException ex)
                 {

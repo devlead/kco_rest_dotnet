@@ -36,7 +36,7 @@ namespace Klarna.Rest.Transport
         /// <returns>the connector</returns>
         public static IConnector Create(string merchantId, string secret, Uri baseUrl)
         {
-            return Create(new RequestFactory(), merchantId, secret, UserAgent.WithDefaultFields(), baseUrl);
+            return Create(new RequestFactory(), merchantId, secret, baseUrl);
         }
 
         /// <summary>
@@ -48,9 +48,9 @@ namespace Klarna.Rest.Transport
         /// <param name="userAgent">the user agent</param>
         /// <param name="baseUrl">the base url</param>
         /// <returns>the connector</returns>
-        internal static IConnector Create(IRequestFactory request, string merchantId, string secret, UserAgent userAgent, Uri baseUrl)
+        internal static IConnector Create(IRequestFactory request, string merchantId, string secret, Uri baseUrl)
         {
-            return new Connector(request, merchantId, secret, userAgent, baseUrl);
+            return new Connector(request, merchantId, secret, baseUrl);
         }
     }
 }

@@ -22,6 +22,7 @@ namespace Klarna.Rest.OrderManagement
 {
     using Klarna.Rest.Models;
     using Klarna.Rest.Models.Requests;
+    using System.Threading.Tasks;
 
     /// <summary>
     /// Capture resource interface.
@@ -32,29 +33,29 @@ namespace Klarna.Rest.OrderManagement
         /// Creates the resource.
         /// </summary>
         /// <param name="captureData">the capture data</param>
-        void Create(CaptureData captureData);
+        Task Create(CaptureData captureData);
 
         /// <summary>
         /// Fetches the capture.
         /// </summary>
         /// <returns>the capture data</returns>
-        CaptureData Fetch();
+        Task<CaptureData> Fetch();
 
         /// <summary>
         /// Appends shipping information to the capture.
         /// </summary>
         /// <param name="shippingInfo">the shipping info</param>
-        void AddShippingInfo(AddShippingInfo shippingInfo);
+        Task AddShippingInfo(AddShippingInfo shippingInfo);
 
         /// <summary>
         /// Updates the customers details.
         /// </summary>
         /// <param name="updateCustomerDetails">the customer details</param>
-        void UpdateCustomerDetails(UpdateCustomerDetails updateCustomerDetails);
+        Task UpdateCustomerDetails(UpdateCustomerDetails updateCustomerDetails);
 
         /// <summary>
         /// Trigger send outs for this capture.
         /// </summary>
-        void TriggerSendOut();
+        Task TriggerSendOut();
     }
 }

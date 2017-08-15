@@ -25,6 +25,7 @@ namespace Klarna.Rest.OrderManagement
     using Klarna.Rest.Models;
     using Klarna.Rest.Models.Requests;
     using Klarna.Rest.Transport;
+    using System.Threading.Tasks;
 
     /// <summary>
     /// Checkout order resource.
@@ -70,9 +71,9 @@ namespace Klarna.Rest.OrderManagement
         /// Fetches the order.
         /// </summary>
         /// <returns>the order data object</returns>
-        public OrderData Fetch()
+        public async Task<OrderData> Fetch()
         {
-            return this.Get(this.Location.ToString())
+            return (await this.Get(this.Location.ToString()))
                 .Status(HttpStatusCode.OK)
                 .ContentType("application/json")
                 .Response.Data<OrderData>();
@@ -81,18 +82,18 @@ namespace Klarna.Rest.OrderManagement
         /// <summary>
         /// Acknowledges the order.
         /// </summary>
-        public void Acknowledge()
+        public async Task Acknowledge()
         {
-            this.Post(this.Location + "/acknowledge", null)
+            (await this.Post(this.Location + "/acknowledge", null))
                 .Status(HttpStatusCode.NoContent);
         }
 
         /// <summary>
         /// Cancels the order.
         /// </summary>
-        public void Cancel()
+        public async Task Cancel()
         {
-            this.Post(this.Location + "/cancel", null)
+            (await this.Post(this.Location + "/cancel", null))
                 .Status(HttpStatusCode.NoContent);
         }
 
@@ -100,18 +101,18 @@ namespace Klarna.Rest.OrderManagement
         /// Updates the authorization data.
         /// </summary>
         /// <param name="updateAuthorization">the updateAuthorization</param>
-        public void UpdateAuthorization(UpdateAuthorization updateAuthorization)
+        public async Task UpdateAuthorization(UpdateAuthorization updateAuthorization)
         {
-            this.Patch(this.Location + "/authorization", updateAuthorization)
+            (await this.Patch(this.Location + "/authorization", updateAuthorization))
                 .Status(HttpStatusCode.NoContent);
         }
 
         /// <summary>
         /// Extends the authorization time.
         /// </summary>
-        public void ExtendAuthorizationTime()
+        public async Task ExtendAuthorizationTime()
         {
-            this.Post(this.Location + "/extend-authorization-time", null)
+            (await this.Post(this.Location + "/extend-authorization-time", null))
                 .Status(HttpStatusCode.NoContent);
         }
 
@@ -119,9 +120,9 @@ namespace Klarna.Rest.OrderManagement
         /// Update the merchant references.
         /// </summary>
         /// <param name="updateMerchantReferences">the update merchant references</param>
-        public void UpdateMerchantReferences(UpdateMerchantReferences updateMerchantReferences)
+        public async Task UpdateMerchantReferences(UpdateMerchantReferences updateMerchantReferences)
         {
-            this.Patch(this.Location + "/merchant-references", updateMerchantReferences)
+            (await this.Patch(this.Location + "/merchant-references", updateMerchantReferences))
                 .Status(HttpStatusCode.NoContent);
         }
 
@@ -129,9 +130,9 @@ namespace Klarna.Rest.OrderManagement
         /// Updates the customer details.
         /// </summary>
         /// <param name="updateCustomerDetails">the order</param>
-        public void UpdateCustomerDetails(UpdateCustomerDetails updateCustomerDetails)
+        public async Task UpdateCustomerDetails(UpdateCustomerDetails updateCustomerDetails)
         {
-            this.Patch(this.Location + "/customer-details", updateCustomerDetails)
+            (await this.Patch(this.Location + "/customer-details", updateCustomerDetails))
                 .Status(HttpStatusCode.NoContent);
         }
 
@@ -139,18 +140,18 @@ namespace Klarna.Rest.OrderManagement
         /// Refunds an amount of a captured order.
         /// </summary>
         /// <param name="data">the refund data</param>
-        public void Refund(Refund data)
+        public async Task Refund(Refund data)
         {
-            this.Post(this.Location + "/refunds", data)
+            (await this.Post(this.Location + "/refunds", data))
                 .Status(HttpStatusCode.Created, HttpStatusCode.NoContent);
         }
 
         /// <summary>
         /// Release the remaining authorization for an order.
         /// </summary>
-        public void ReleaseRemainingAuthorization()
+        public async Task ReleaseRemainingAuthorization()
         {
-            this.Post(this.Location + "/release-remaining-authorization", null)
+            (await this.Post(this.Location + "/release-remaining-authorization", null))
                 .Status(HttpStatusCode.NoContent);
         }
 
